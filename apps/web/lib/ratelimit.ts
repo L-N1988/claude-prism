@@ -15,7 +15,7 @@ export const chatRatelimit = redis
   ? new Ratelimit({
       redis,
       limiter: Ratelimit.slidingWindow(20, "1m"),
-      prefix: "openprism::ratelimit::chat",
+      prefix: "claudeprism::ratelimit::chat",
     })
   : null;
 
@@ -23,7 +23,7 @@ export const compileRatelimit = redis
   ? new Ratelimit({
       redis,
       limiter: Ratelimit.slidingWindow(30, "1m"),
-      prefix: "openprism::ratelimit::compile",
+      prefix: "claudeprism::ratelimit::compile",
     })
   : null;
 

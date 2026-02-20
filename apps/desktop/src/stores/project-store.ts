@@ -40,7 +40,7 @@ export const useProjectStore = create<ProjectState>()(
       },
     }),
     {
-      name: "open-prism-projects",
+      name: "claude-prism-projects",
     },
   ),
 );

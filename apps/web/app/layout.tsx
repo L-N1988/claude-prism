@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Open-Prism | LaTeX Writing Workspace",
+  title: "ClaudePrism | LaTeX Writing Workspace",
   description: "AI-powered LaTeX writing workspace inspired by OpenAI Prism",
 };
 

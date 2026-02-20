@@ -38,7 +38,7 @@ async function main() {
     port,
   });
 
-  console.log(`Open-Prism sidecar running on port ${port}`);
+  console.log(`ClaudePrism sidecar running on port ${port}`);
 }
 
 main();

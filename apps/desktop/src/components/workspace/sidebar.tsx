@@ -351,7 +351,7 @@ export function Sidebar() {
       {/* Header */}
       <div className="flex h-12 items-center justify-between border-sidebar-border border-b px-3">
         <div className="flex flex-col">
-          <span className="font-semibold text-sm">OpenPrism</span>
+          <span className="font-semibold text-sm">ClaudePrism</span>
           <span className="text-muted-foreground text-xs">
             {projectRoot?.split("/").pop() || "Desktop"}
           </span>
@@ -464,11 +464,11 @@ export function Sidebar() {
 
       {/* Footer */}
       <div className="flex items-center justify-between border-sidebar-border border-t px-3 py-2 text-muted-foreground text-xs">
-        <span>OpenPrism v{APP_VERSION}</span>
+        <span>ClaudePrism v{APP_VERSION}</span>
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="icon" className="size-6" asChild>
             <a
-              href="https://github.com/assistant-ui/open-prism"
+              href="https://github.com/delibae/claude-prism"
               target="_blank"
               rel="noopener noreferrer"
               title="GitHub"

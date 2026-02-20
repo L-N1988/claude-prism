@@ -2,18 +2,18 @@ import { openDB, type IDBPDatabase } from "idb";
 import type { StateStorage } from "zustand/middleware";
 import type { ProjectFile } from "@/stores/document-store";
 import {
-  type OpenPrismDB,
+  type ClaudePrismDB,
   DB_NAME,
   DB_VERSION,
   STORAGE_VERSION,
 } from "./schema";
 import { migrateFromLocalStorage } from "./migrate";
 
-let dbPromise: Promise<IDBPDatabase<OpenPrismDB>> | null = null;
+let dbPromise: Promise<IDBPDatabase<ClaudePrismDB>> | null = null;
 
-function getDB(): Promise<IDBPDatabase<OpenPrismDB>> {
+function getDB(): Promise<IDBPDatabase<ClaudePrismDB>> {
   if (!dbPromise) {
-    dbPromise = openDB<OpenPrismDB>(DB_NAME, DB_VERSION, {
+    dbPromise = openDB<ClaudePrismDB>(DB_NAME, DB_VERSION, {
       upgrade(db) {
         if (!db.objectStoreNames.contains("documentState")) {
           db.createObjectStore("documentState");

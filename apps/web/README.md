@@ -1,1 +1,1 @@
-# Open Prism
+# ClaudePrism

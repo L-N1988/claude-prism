@@ -1,7 +1,7 @@
 import type { DBSchema } from "idb";
 import type { ProjectFile } from "@/stores/document-store";
 
-export interface OpenPrismDB extends DBSchema {
+export interface ClaudePrismDB extends DBSchema {
   documentState: {
     key: "state";
     value: {
@@ -20,6 +20,6 @@ export interface OpenPrismDB extends DBSchema {
   };
 }
 
-export const DB_NAME = "open-prism";
+export const DB_NAME = "claude-prism";
 export const DB_VERSION = 1;
 export const STORAGE_VERSION = 1;

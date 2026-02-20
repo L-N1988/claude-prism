@@ -1,7 +1,7 @@
 import type { ProjectFile } from "@/stores/document-store";
 
-const LOCALSTORAGE_KEY = "open-prism-document";
-const MIGRATION_FLAG = "open-prism-migrated-to-indexeddb";
+const LOCALSTORAGE_KEY = "claude-prism-document";
+const MIGRATION_FLAG = "claude-prism-migrated-to-indexeddb";
 
 interface OldPersistedState {
   state: {

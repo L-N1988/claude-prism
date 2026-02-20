@@ -185,7 +185,7 @@ export function ProjectPicker() {
       <div className="flex w-full max-w-md flex-col items-center gap-8 px-8">
         <div className="flex flex-col items-center gap-2">
           <FileTextIcon className="size-12 text-primary" />
-          <h1 className="font-bold text-2xl">Open-Prism</h1>
+          <h1 className="font-bold text-2xl">ClaudePrism</h1>
           <p className="text-center text-muted-foreground text-sm">
             AI-powered LaTeX writing workspace
           </p>

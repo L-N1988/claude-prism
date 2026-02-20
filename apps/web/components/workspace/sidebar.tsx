@@ -206,7 +206,7 @@ export function Sidebar() {
     >
       <div className="flex h-12 items-center border-sidebar-border border-b px-3">
         <div className="flex flex-col">
-          <span className="font-semibold text-sm">OpenPrism</span>
+          <span className="font-semibold text-sm">ClaudePrism</span>
           <span className="text-muted-foreground text-xs">
             By{" "}
             <a
@@ -333,11 +333,11 @@ export function Sidebar() {
       </div>
 
       <div className="flex items-center justify-between border-sidebar-border border-t px-3 py-2 text-muted-foreground text-xs">
-        <span>OpenPrism v{packageJson.version}</span>
+        <span>ClaudePrism v{packageJson.version}</span>
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="icon" className="size-6" asChild>
             <a
-              href="https://github.com/assistant-ui/open-prism"
+              href="https://github.com/delibae/claude-prism"
               target="_blank"
               rel="noopener noreferrer"
               title="GitHub"

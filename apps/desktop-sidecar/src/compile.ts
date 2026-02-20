@@ -78,7 +78,7 @@ export const compileRoutes = new Hono();
 compileRoutes.use("/builds/*", bodyLimit({ maxSize: 10 * 1024 * 1024 }));
 
 compileRoutes.get("/", (c) => {
-  return c.json({ status: "ok", service: "open-prism-sidecar" });
+  return c.json({ status: "ok", service: "claude-prism-sidecar" });
 });
 
 compileRoutes.post("/builds/sync", async (c) => {

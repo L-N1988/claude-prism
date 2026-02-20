@@ -16,8 +16,8 @@ function WorkspaceWithClaude() {
   // Update window title
   useEffect(() => {
     if (projectRoot) {
-      const name = projectRoot.split("/").pop() || "Open-Prism";
-      getCurrentWindow().setTitle(`${name} - Open-Prism`);
+      const name = projectRoot.split("/").pop() || "ClaudePrism";
+      getCurrentWindow().setTitle(`${name} - ClaudePrism`);
     }
   }, [projectRoot]);
 

@@ -26,7 +26,8 @@ import {
   findPrevious,
 } from "@codemirror/search";
 import { unifiedMergeView, getChunks, acceptChunk, rejectChunk } from "@codemirror/merge";
-import { latex } from "codemirror-lang-latex";
+import { latex, latexLinter } from "codemirror-lang-latex";
+import { linter, lintGutter, type Diagnostic } from "@codemirror/lint";
 import { useDocumentStore } from "@/stores/document-store";
 import { useProposedChangesStore, type ProposedChange } from "@/stores/proposed-changes-store";
 import { useClaudeChatStore } from "@/stores/claude-chat-store";
@@ -333,7 +334,29 @@ export function LatexEditor() {
         highlightActiveLineGutter(),
         history(),
         keymap.of([...defaultKeymap, ...historyKeymap]),
-        latex(),
+        latex({ enableLinting: false }),
+        linter((view) => {
+          const baseLinter = latexLinter();
+          const diagnostics = baseLinter(view);
+          return diagnostics.map((d: Diagnostic) => ({
+            ...d,
+            actions: [
+              ...(d.actions ?? []),
+              {
+                name: "Fix with chat",
+                apply: (v: EditorView, from: number, _to: number) => {
+                  const line = v.state.doc.lineAt(from);
+                  const docState = useDocumentStore.getState();
+                  const file = docState.files.find((f) => f.id === docState.activeFileId);
+                  const fileName = file?.relativePath ?? "document.tex";
+                  const ctx = `[Lint error in ${fileName}:${line.number}]\n[Error: ${d.message}]`;
+                  useClaudeChatStore.getState().sendPrompt(`${ctx}\n\nFix this lint error.`);
+                },
+              },
+            ],
+          }));
+        }),
+        lintGutter(),
         themeCompartmentRef.current.of(
           resolvedTheme === "dark"
             ? [oneDark, syntaxHighlighting(oneDarkHighlightStyle)]
@@ -375,6 +398,24 @@ export function LatexEditor() {
           ".cm-changeGutter": { width: "3px", minWidth: "3px" },
           ".cm-changedLineGutter": { backgroundColor: "#22c55e" },
           ".cm-deletedLineGutter": { backgroundColor: "#ef4444" },
+          ".cm-diagnostic": {
+            padding: "6px 10px",
+          },
+          ".cm-diagnosticAction": {
+            display: "inline-block",
+            padding: "3px 10px",
+            borderRadius: "4px",
+            fontSize: "12px",
+            fontWeight: "600",
+            cursor: "pointer",
+            backgroundColor: "rgb(139, 92, 246)",
+            color: "#fff",
+            border: "none",
+            marginTop: "6px",
+          },
+          ".cm-diagnosticAction:hover": {
+            backgroundColor: "rgb(124, 58, 237)",
+          },
         }),
       ],
     });

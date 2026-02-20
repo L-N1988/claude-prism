@@ -14,14 +14,14 @@ const DEFAULT_TEX_CONTENT = `\\documentclass[11pt]{article}
 
 \\begin{document}
 
-\\section*{What is Open-Prism?}
+\\section*{What is ClaudePrism?}
 
-\\textbf{Open-Prism} is an AI-powered \\LaTeX{} editor for writing scientific documents. It features built-in AI assistance to help you draft and edit text, reason through ideas, and handle formatting.
+\\textbf{ClaudePrism} is an AI-powered \\LaTeX{} editor for writing scientific documents. It features built-in AI assistance to help you draft and edit text, reason through ideas, and handle formatting.
 
 \\section*{Features}
 
 \\begin{multicols}{2}
-Open-Prism integrates AI directly in the editor with access to your project, so you can ask it to:
+ClaudePrism integrates AI directly in the editor with access to your project, so you can ask it to:
 
 \`\`Add the Laplace transform of $t\\cos(at)$ in the introduction.''
 \\[
@@ -304,7 +304,7 @@ export const useDocumentStore = create<DocumentState>()(
       },
     }),
     {
-      name: "open-prism-document",
+      name: "claude-prism-document",
       storage: createJSONStorage(() => indexedDBStorage),
       partialize: (state) => ({
         files: state.files,

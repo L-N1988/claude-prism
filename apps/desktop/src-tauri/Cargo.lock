@@ -298,6 +298,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "claude-prism-desktop"
+version = "0.0.1"
+dependencies = [
+ "dirs 5.0.1",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-dialog",
+ "tauri-plugin-fs",
+ "tauri-plugin-process",
+ "tauri-plugin-shell",
+ "tokio",
+]
+
+[[package]]
 name = "combine"
 version = "4.6.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2119,22 +2135,6 @@ dependencies = [
  "is-wsl",
  "libc",
  "pathdiff",
-]
-
-[[package]]
-name = "open-prism-desktop"
-version = "0.0.1"
-dependencies = [
- "dirs 5.0.1",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-dialog",
- "tauri-plugin-fs",
- "tauri-plugin-process",
- "tauri-plugin-shell",
- "tokio",
 ]
 
 [[package]]

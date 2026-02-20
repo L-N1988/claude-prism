@@ -3,6 +3,8 @@ import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 import { LoaderIcon } from "lucide-react";
+import { open as shellOpen } from "@tauri-apps/plugin-shell";
+import { ask } from "@tauri-apps/plugin-dialog";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
@@ -287,6 +289,56 @@ export function PdfViewer({
     container.addEventListener("wheel", handleWheel, { passive: false });
     return () => container.removeEventListener("wheel", handleWheel);
   }, [scale, onScaleChange]);
+
+  // Intercept annotation layer link clicks — prevent in-app navigation
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const anchor = target.closest("a") as HTMLAnchorElement | null;
+      if (!anchor) return;
+      // Only intercept links within the annotation layer
+      if (!anchor.closest(".react-pdf__Page__annotations")) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const href = anchor.href;
+      if (!href) return;
+
+      // Internal PDF links (e.g. #page=3) — scroll to page
+      if (href.includes("#page=")) {
+        const match = href.match(/#page=(\d+)/);
+        if (match) {
+          const pageNum = parseInt(match[1], 10);
+          const pageEl = container.querySelector(
+            `[data-page-number="${pageNum}"]`,
+          ) as HTMLElement | null;
+          if (pageEl) {
+            pageEl.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }
+        return;
+      }
+
+      // External links — confirm then open in system default browser
+      if (href.startsWith("http://") || href.startsWith("https://") || href.startsWith("mailto:")) {
+        ask(`Open in browser?\n${href}`, {
+          title: "External Link",
+          kind: "info",
+          okLabel: "Open",
+          cancelLabel: "Cancel",
+        }).then((confirmed) => {
+          if (confirmed) shellOpen(href);
+        });
+      }
+    };
+
+    container.addEventListener("click", handleClick, true); // capture phase
+    return () => container.removeEventListener("click", handleClick, true);
+  }, []);
 
   return (
     <div ref={containerRef} className="flex-1 overflow-auto">

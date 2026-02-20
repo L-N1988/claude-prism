@@ -1,5 +1,5 @@
 {
-  "name": "@open-prism/desktop",
+  "name": "@claude-prism/desktop",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -12,6 +12,7 @@
   "dependencies": {
     "@codemirror/commands": "^6.10.1",
     "@codemirror/lang-markdown": "^6.5.0",
+    "@codemirror/lint": "^6.8.4",
     "@codemirror/language": "^6.12.1",
     "@codemirror/merge": "^6.11.2",
     "@codemirror/search": "^6.6.0",

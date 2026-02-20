@@ -1,5 +1,5 @@
 {
-  "name": "@open-prism/desktop-sidecar",
+  "name": "@claude-prism/desktop-sidecar",
   "version": "0.0.1",
   "private": true,
   "type": "module",
