@@ -4,7 +4,7 @@ mod zotero;
 
 use std::process::Command;
 use std::sync::Mutex;
-use tauri::Manager;
+use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
 
 #[cfg(target_os = "macos")]
 fn set_macos_app_icon() {
@@ -53,6 +53,32 @@ fn start_sidecar(sidecar_path: &str, port: u16) -> Option<std::process::Child> {
 #[tauri::command]
 fn get_sidecar_url() -> String {
     "http://localhost:3001".to_string()
+}
+
+#[tauri::command]
+fn create_new_window(app: tauri::AppHandle) -> Result<(), String> {
+    let label = format!("window-{}", std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_millis());
+
+    let mut builder = WebviewWindowBuilder::new(&app, &label, WebviewUrl::default())
+        .title("ClaudePrism")
+        .inner_size(1400.0, 900.0)
+        .min_inner_size(800.0, 600.0)
+        .visible(false)
+        .hidden_title(true);
+
+    #[cfg(target_os = "macos")]
+    {
+        builder = builder
+            .title_bar_style(tauri::TitleBarStyle::Overlay)
+            .traffic_light_position(tauri::LogicalPosition::new(12.0, 12.0));
+    }
+
+    builder.build().map_err(|e| format!("Failed to create window: {}", e))?;
+
+    Ok(())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -106,11 +132,14 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             get_sidecar_url,
+            create_new_window,
             claude::execute_claude_code,
             claude::continue_claude_code,
             claude::resume_claude_code,
             claude::cancel_claude_execution,
             claude::run_shell_command,
+            claude::list_claude_sessions,
+            claude::load_session_history,
             zotero::zotero_start_oauth,
             zotero::zotero_complete_oauth,
             zotero::zotero_cancel_oauth,
@@ -127,15 +156,32 @@ pub fn run() {
         .expect("error while building tauri application");
 
     app.run(|app_handle, event| {
-        if let tauri::RunEvent::ExitRequested { .. } = event {
-            // Kill sidecar on exit
-            let state = app_handle.state::<Mutex<SidecarState>>();
-            if let Ok(mut guard) = state.lock() {
-                if let Some(ref mut child) = guard.child {
-                    let _ = child.kill();
-                    println!("Sidecar process killed");
+        match event {
+            tauri::RunEvent::WindowEvent { label, event: tauri::WindowEvent::Destroyed, .. } => {
+                // Kill Claude process associated with this window
+                let claude_state = app_handle.state::<claude::ClaudeProcessState>();
+                let label_clone = label.clone();
+                let state_clone = claude_state.inner().clone();
+                tauri::async_runtime::spawn(async move {
+                    claude::kill_process_for_window(&state_clone, &label_clone).await;
+                });
+
+                // Quit the app when the last window is closed
+                if app_handle.webview_windows().is_empty() {
+                    app_handle.exit(0);
                 }
-            };
+            }
+            tauri::RunEvent::ExitRequested { .. } => {
+                // Kill sidecar on exit
+                let state = app_handle.state::<Mutex<SidecarState>>();
+                if let Ok(mut guard) = state.lock() {
+                    if let Some(ref mut child) = guard.child {
+                        let _ = child.kill();
+                        println!("Sidecar process killed");
+                    }
+                };
+            }
+            _ => {}
         }
     });
 }

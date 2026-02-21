@@ -9,6 +9,7 @@ import { useClaudeChatStore } from "@/stores/claude-chat-store";
 import { useClaudeEvents } from "@/hooks/use-claude-events";
 import { ChatMessages } from "./chat-messages";
 import { ChatComposer } from "./chat-composer";
+import { SessionSelector } from "./session-selector";
 
 const MIN_HEIGHT = 150;
 const DEFAULT_HEIGHT = 360;
@@ -80,7 +81,7 @@ export function ClaudeChatDrawer() {
   return (
     <div
       ref={containerRef}
-      className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center p-4 pb-6"
+      className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center p-4 pb-6"
     >
       {/* Floating toggle button */}
       <button
@@ -109,18 +110,23 @@ export function ClaudeChatDrawer() {
         )}
         style={{ height: isOpen ? height : 0 }}
       >
-        {/* Drag handle */}
-        <div
-          className="group flex cursor-row-resize items-center justify-center gap-2 py-2 transition-colors hover:bg-muted/50"
-          onMouseDown={handleMouseDown}
-          onClick={() => {
-            if (!hasDraggedRef.current) {
-              setIsOpen(false);
-            }
-          }}
-        >
-          <div className="h-1 w-10 rounded-full bg-muted-foreground/30 transition-all group-hover:w-8" />
-          <ChevronDownIcon className="size-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+        {/* Header with drag handle and session selector */}
+        <div className="relative">
+          <div
+            className="group flex cursor-row-resize items-center justify-center gap-2 py-2 transition-colors hover:bg-muted/50"
+            onMouseDown={handleMouseDown}
+            onClick={() => {
+              if (!hasDraggedRef.current) {
+                setIsOpen(false);
+              }
+            }}
+          >
+            <div className="h-1 w-10 rounded-full bg-muted-foreground/30 transition-all group-hover:w-8" />
+            <ChevronDownIcon className="size-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+          </div>
+          <div className="absolute top-1/2 right-2 -translate-y-1/2">
+            <SessionSelector />
+          </div>
         </div>
 
         {/* Error banner */}

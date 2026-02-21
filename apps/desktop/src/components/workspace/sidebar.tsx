@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import {
   FileTextIcon,
   FolderIcon,
-  FolderOpenIcon,
+  HomeIcon,
   FolderPlusIcon,
   ImageIcon,
   PlusIcon,
@@ -21,6 +21,7 @@ import {
   FileIcon,
   FileSpreadsheetIcon,
   GripVerticalIcon,
+  AppWindowIcon,
 } from "lucide-react";
 import {
   DndContext,
@@ -63,6 +64,7 @@ import {
 } from "@/components/ui/context-menu";
 import { Input } from "@/components/ui/input";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
+import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 
 // ─── Table of Contents ───
@@ -522,23 +524,25 @@ export function Sidebar() {
 
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
-      {/* Header */}
-      <div className="flex h-12 items-center justify-between border-sidebar-border border-b px-3">
-        <div className="flex flex-col">
+      {/* Header — padded top for macOS overlay titlebar */}
+      <div className="relative flex items-center justify-center border-sidebar-border border-b px-3 pt-[var(--titlebar-height)] h-[calc(48px+var(--titlebar-height))]">
+        <div className="flex flex-col items-center">
           <span className="font-semibold text-sm">ClaudePrism</span>
           <span className="text-muted-foreground text-xs">
             {projectRoot?.split("/").pop() || "Desktop"}
           </span>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="size-6"
-          onClick={closeProject}
-          title="Close Project"
-        >
-          <FolderOpenIcon className="size-3.5" />
-        </Button>
+        <div className="absolute right-3 flex items-center gap-0.5">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-6"
+            onClick={closeProject}
+            title="Close Project"
+          >
+            <HomeIcon className="size-3.5" />
+          </Button>
+        </div>
       </div>
 
       {/* Resizable sections */}
@@ -546,33 +550,35 @@ export function Sidebar() {
         {/* Files */}
         <Panel defaultSize={50} minSize={15}>
           <div ref={sidebarFilesRef} className="flex h-full flex-col" data-sidebar-files>
-            <div className="flex h-8 shrink-0 items-center justify-between border-sidebar-border border-b px-3">
+            <div className="relative flex h-8 shrink-0 items-center justify-center border-sidebar-border border-b px-3">
               <div className="flex items-center gap-2">
                 <FolderIcon className="size-3.5 text-muted-foreground" />
                 <span className="font-medium text-xs">Files</span>
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="size-5" title="Add">
-                    <PlusIcon className="size-3" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => openNewFileDialog()}>
-                    <FileTextIcon className="mr-2 size-4" />
-                    New LaTeX File
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => openNewFolderDialog()}>
-                    <FolderPlusIcon className="mr-2 size-4" />
-                    New Folder
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => handleImport()}>
-                    <UploadIcon className="mr-2 size-4" />
-                    Import File
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="absolute right-3">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="size-5" title="Add">
+                      <PlusIcon className="size-3" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => openNewFileDialog()}>
+                      <FileTextIcon className="mr-2 size-4" />
+                      New LaTeX File
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openNewFolderDialog()}>
+                      <FolderPlusIcon className="mr-2 size-4" />
+                      New Folder
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => handleImport()}>
+                      <UploadIcon className="mr-2 size-4" />
+                      Import File
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
             <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragOver={(e) => console.log("[dnd] dragOver:", e.over?.id ?? "none")}>
               <ContextMenu>
@@ -634,7 +640,7 @@ export function Sidebar() {
         {/* Outline */}
         <Panel defaultSize={20} minSize={10}>
           <div className="flex h-full flex-col">
-            <div className="flex h-8 shrink-0 items-center gap-2 px-3">
+            <div className="flex h-8 shrink-0 items-center justify-center gap-2 px-3">
               <ListIcon className="size-3.5 text-muted-foreground" />
               <span className="font-medium text-xs">Outline</span>
             </div>
@@ -676,9 +682,9 @@ export function Sidebar() {
       </PanelGroup>
 
       {/* Footer */}
-      <div className="flex items-center justify-between border-sidebar-border border-t px-3 py-2 text-muted-foreground text-xs">
+      <div className="relative flex items-center justify-center border-sidebar-border border-t px-3 py-2 text-muted-foreground text-xs">
         <span>ClaudePrism v{APP_VERSION}</span>
-        <div className="flex items-center gap-1">
+        <div className="absolute right-3 flex items-center gap-1">
           <Button variant="ghost" size="icon" className="size-6" asChild>
             <a
               href="https://github.com/delibae/claude-prism"

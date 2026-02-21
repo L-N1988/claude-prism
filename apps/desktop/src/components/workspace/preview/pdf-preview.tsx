@@ -447,7 +447,7 @@ export function PdfPreview() {
 
   return (
     <div ref={previewContainerRef} className="relative flex h-full flex-col bg-muted/50">
-      <div className="flex h-10 items-center justify-between border-border border-b bg-background px-2">
+      <div className="flex items-center border-border border-b bg-background px-2 pt-[var(--titlebar-height)] h-[calc(40px+var(--titlebar-height))]">
         <div className="flex items-center gap-1">
           {isSaving && (
             <div className="flex items-center gap-1.5 rounded-md bg-muted/50 px-2 py-1">
@@ -474,6 +474,7 @@ export function PdfPreview() {
             </Button>
           )}
         </div>
+        <div data-tauri-drag-region className="flex-1 self-stretch" />
         <div className="flex items-center gap-1">
           {pdfData && (
             <>

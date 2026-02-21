@@ -57,11 +57,17 @@ interface ClaudeChatState {
   totalInputTokens: number;
   totalOutputTokens: number;
 
+  /** Deferred prompt to send once the workspace is ready (set by project wizard) */
+  pendingInitialPrompt: string | null;
+  setPendingInitialPrompt: (prompt: string | null) => void;
+  consumePendingInitialPrompt: () => string | null;
+
   // Actions
   sendPrompt: (userPrompt: string, contextOverride?: { label: string; filePath: string; selectedText: string }) => Promise<void>;
   cancelExecution: () => Promise<void>;
   clearMessages: () => void;
   newSession: () => void;
+  resumeSession: (sessionId: string) => Promise<void>;
 
   // Internal actions (called by event hook)
   _appendMessage: (msg: ClaudeStreamMessage) => void;
@@ -79,6 +85,16 @@ export const useClaudeChatStore = create<ClaudeChatState>()((set, get) => ({
   error: null,
   totalInputTokens: 0,
   totalOutputTokens: 0,
+
+  pendingInitialPrompt: null,
+  setPendingInitialPrompt: (prompt) => set({ pendingInitialPrompt: prompt }),
+  consumePendingInitialPrompt: () => {
+    const { pendingInitialPrompt } = get();
+    if (pendingInitialPrompt) {
+      set({ pendingInitialPrompt: null });
+    }
+    return pendingInitialPrompt;
+  },
 
   sendPrompt: async (userPrompt: string, contextOverride?: { label: string; filePath: string; selectedText: string }) => {
     const { sessionId, isStreaming } = get();
@@ -211,6 +227,49 @@ export const useClaudeChatStore = create<ClaudeChatState>()((set, get) => ({
       totalInputTokens: 0,
       totalOutputTokens: 0,
     });
+  },
+
+  resumeSession: async (sessionId: string) => {
+    const projectPath = useDocumentStore.getState().projectRoot;
+    console.log("[store] resumeSession called:", { sessionId, projectPath });
+
+    // Reset state with new session ID
+    set({
+      messages: [],
+      sessionId,
+      error: null,
+      isStreaming: false,
+      totalInputTokens: 0,
+      totalOutputTokens: 0,
+    });
+
+    // Load session history from JSONL file
+    if (projectPath) {
+      try {
+        console.log("[store] loading session history...");
+        const history = await invoke<any[]>("load_session_history", {
+          projectPath,
+          sessionId,
+        });
+        console.log("[store] received history entries:", history.length);
+
+        // Filter to displayable message types and map to ClaudeStreamMessage
+        const messages: ClaudeStreamMessage[] = [];
+        for (const entry of history) {
+          const type = entry.type;
+          if (type === "user" || type === "assistant" || type === "result") {
+            messages.push(entry as ClaudeStreamMessage);
+          }
+        }
+
+        console.log("[store] filtered to displayable messages:", messages.length);
+        set({ messages });
+      } catch (err) {
+        console.error("[store] Failed to load session history:", err);
+      }
+    } else {
+      console.warn("[store] no projectPath, skipping history load");
+    }
   },
 
   _appendMessage: (msg: ClaudeStreamMessage) => {

@@ -153,7 +153,7 @@ export function ZoteroHeader() {
   const loadCollections = useZoteroStore((s) => s.loadCollections);
 
   return (
-    <div className="flex w-full items-center justify-between px-3">
+    <div className="relative flex w-full items-center justify-center px-3">
       <div className="flex items-center gap-2">
         <span
           className={cn(
@@ -164,7 +164,7 @@ export function ZoteroHeader() {
         <span className="font-medium text-xs">Zotero</span>
       </div>
       {isAuthenticated && (
-        <div className="flex items-center gap-1">
+        <div className="absolute right-3 flex items-center gap-1">
           <button
             className="rounded p-1 text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
             onClick={loadCollections}
